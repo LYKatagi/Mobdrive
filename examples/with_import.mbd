@@ -1,0 +1,8 @@
+enter(mode.mbd) {
+    const path "mode.mbdb";
+};
+
+function main() -> int {
+    print(mode_value());
+    return 0;
+}

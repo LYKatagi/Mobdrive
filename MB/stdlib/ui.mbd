@@ -1,0 +1,9 @@
+// Native drawing API. Windows uses a Win32/GDI backend.
+bin function ui_window_open(string title, int32 width, int32 height)::link() -> bool;
+bin function ui_event_loop()::link() -> void;
+bin function ui_window_close()::link() -> void;
+bin function draw_rect(int32 x, int32 y, int32 width, int32 height, uint32 color)::link() -> void;
+bin function draw_text(int32 x, int32 y, string text)::link() -> void;
+bin function draw_text_color(int32 x, int32 y, string text, uint32 color)::link() -> void;
+bin function ui_draw_rect(int32 x, int32 y, int32 width, int32 height, uint32 color)::link() -> void;
+bin function ui_draw_text(int32 x, int32 y, string text)::link() -> void;

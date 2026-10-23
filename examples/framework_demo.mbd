@@ -1,0 +1,85 @@
+/*
+    Mobdrive Framework - Exemplo Conceitual 0.2
+    Demonstração de Kernel, Módulos e Interface Gráfica
+*/
+
+enter(/gc.mbd) {
+    const path "gc.mbdb";
+};
+
+enter(/ui.mbd) {
+    const path "ui.mbdb";
+};
+
+namespace system {
+    const MAX_DRIVERS: int32 = 16;
+
+    bin function init_display_hardware()::link() -> int32;
+    bin function log_kernel_error()::decide() -> void;
+}
+
+socket Runnable {
+    function run() -> void;
+}
+
+nochk {
+    system::init_display_hardware
+}::strict;
+
+function setup_kernel_display() -> bool {
+    unsafe {
+        var status: int32 = system::init_display_hardware();
+        if (status != 0) {
+            return false;
+        }
+
+        // Example hardware address. Do not run this host build: the address
+        // belongs to a target kernel's memory map, not a normal Windows process.
+        var vram_ptr: int32* = 0x3F000000;
+        *vram_ptr = 0xFFFFFF;
+    }
+    return true;
+}
+
+class DataManager plug Runnable {
+    public var record_count: int32;
+
+    public function run() -> void {
+        var data_ptr: int32* = gc_alloc(32);
+        gc_root(&data_ptr);
+
+        *data_ptr = 42;
+        print("Lógica rodando e dados alocados de forma segura.");
+
+        gc_unroot(&data_ptr);
+    }
+}
+
+graphic class MainScreen plug Runnable {
+    public var title: string;
+
+    public visual run() -> void {
+        title = "Mobdrive OS Mobile v0.2";
+        print(title);
+
+        ui_draw_rect(10, 10, 300, 200, 0x00FF00);
+        ui_draw_text(20, 20, "Bem-vindo ao Alto Nível Gráfico!");
+    }
+}
+
+function main() -> int32 {
+    print("Iniciando sistema híbrido Mobdrive...");
+
+    var hardware_ready: bool = setup_kernel_display();
+    if (!hardware_ready) {
+        return 1;
+    }
+
+    var manager: DataManager = new DataManager();
+    manager.run();
+
+    var screen: MainScreen = new MainScreen();
+    screen.run();
+
+    return 0;
+}

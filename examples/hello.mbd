@@ -1,0 +1,5 @@
+function main() -> int {
+    const string greeting = "Hello from Mobdrive!";
+    print(greeting);
+    return 0;
+}

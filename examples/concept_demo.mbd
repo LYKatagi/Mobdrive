@@ -1,0 +1,93 @@
+/*
+    Mobdrive Demo
+    Versão conceitual 0.1
+*/
+
+enter(mode.mbd) {
+    const path "mode.mdb";
+};
+
+const VERSION: string = "0.1.0";
+var counter: int32 = 0;
+var message = "Hello, Mobdrive!";
+
+function add(a: int32, b: int32) -> int32 {
+    return a + b;
+}
+
+function greet() -> void {
+    print("Welcome to Mobdrive!");
+}
+
+bin function native_hello()::link() -> void;
+bin function external_hello()::nolink() -> void;
+bin function platform_hello()::decide() -> void;
+
+nochk {
+    add,
+    native_hello
+}::strict;
+
+nochk {
+    external_hello
+}::minchk;
+
+nochk {
+    platform_hello
+}::none;
+
+safe {
+    var result: int32 = add(10, 20);
+    print(result);
+    greet();
+}
+
+unsafe {
+    native_hello();
+    external_hello();
+    platform_hello();
+}
+
+function count_to(limit: int32) -> void {
+    var i: int32 = 0;
+    while (i < limit) {
+        if (i == 5) {
+            print("Reached five!");
+        } else {
+            print(i);
+        }
+        i = i + 1;
+    }
+}
+
+class Device {
+    public var name: string;
+
+    public function start() -> void {
+        print("Device started");
+    }
+}
+
+class MobileDevice extends Device {
+    public function show_info() -> void {
+        print(name);
+    }
+}
+
+interface Runnable {
+    function run() -> void;
+}
+
+class App implements Runnable {
+    public function run() -> void {
+        print("App running");
+    }
+}
+
+function main() -> int32 {
+    greet();
+    var total: int32 = add(15, 25);
+    print(total);
+    count_to(10);
+    return 0;
+}

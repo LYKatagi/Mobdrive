@@ -1,0 +1,4 @@
+// Monotonic clock helpers. Durations are measured in milliseconds.
+bin function time_now_ms()::link() -> i64;
+bin function time_sleep_ms(i64 milliseconds)::link() -> void;
+bin function time_elapsed_ms(i64 start_ms)::link() -> i64;

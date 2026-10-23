@@ -1,0 +1,29 @@
+enter(/gc.mbd) {
+    const path "gc.mbdb";
+};
+
+namespace demo {
+    const BASE: int32 = 40;
+
+    function value() -> int32 {
+        return BASE + 2;
+    }
+
+    function answer() -> int32 {
+        return value();
+    }
+}
+
+function main() -> int32 {
+    var value_ptr: int32* = gc_alloc(16);
+    gc_root(&value_ptr);
+    *value_ptr = demo::answer();
+
+    print(*value_ptr);
+    gc_collect();
+    print(*value_ptr);
+
+    gc_unroot(&value_ptr);
+    gc_collect();
+    return 0;
+}

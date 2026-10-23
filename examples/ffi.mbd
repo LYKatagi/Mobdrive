@@ -1,0 +1,12 @@
+bin function hello_native()::nolink() -> void;
+
+nochk {
+    hello_native
+}::strict;
+
+function main() -> int {
+    unsafe {
+        hello_native();
+    }
+    return 0;
+}

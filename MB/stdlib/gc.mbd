@@ -1,0 +1,5 @@
+// Managed allocations use explicit pointer types and registered roots.
+bin function gc_alloc(i64 size)::link() -> void*;
+bin function gc_root(void* pointer_slot)::link() -> void;
+bin function gc_unroot(void* pointer_slot)::link() -> void;
+bin function gc_collect()::link() -> void;

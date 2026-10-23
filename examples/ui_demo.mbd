@@ -1,0 +1,20 @@
+enter(/ui.mbd) {
+    const path "ui.mbdb";
+};
+
+graphic class MainScreen {
+    public var title: string;
+
+    public visual run() -> void {
+        title = "Janela nativa Mobdrive";
+        draw_rect(40, 60, 360, 180, 0x2D7DCE);
+        draw_text_color(60, 90, "Mobdrive desenha numa janela real", 0xFFFFFF);
+        draw_text(60, 125, "Feche a janela para terminar.");
+    }
+}
+
+function main() -> int32 {
+    var screen: MainScreen = new MainScreen();
+    screen.run();
+    return 0;
+}

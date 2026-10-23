@@ -1,0 +1,23 @@
+function abs_i64(i64 value) -> i64 {
+    if (value < 0) {
+        return 0 - value;
+    } else {
+        return value;
+    }
+}
+
+function min_i64(i64 left, i64 right) -> i64 {
+    if (left < right) {
+        return left;
+    } else {
+        return right;
+    }
+}
+
+function max_i64(i64 left, i64 right) -> i64 {
+    if (left > right) {
+        return left;
+    } else {
+        return right;
+    }
+}

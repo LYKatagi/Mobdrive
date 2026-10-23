@@ -1,0 +1,8 @@
+// Minimal freestanding x86-64 example; execute only under a kernel-aware VM.
+function main() -> int32 {
+    unsafe {
+        __c__("volatile unsigned short *vga = (unsigned short *)0xB8000; vga[0] = 0x2F4D;");
+        __asm__("hlt");
+    }
+    return 0;
+}

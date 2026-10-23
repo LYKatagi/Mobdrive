@@ -1,0 +1,25 @@
+bin function mbd_io_print_i64(i64 value)::link() -> void;
+bin function mbd_io_print_f64(double value)::link() -> void;
+bin function mbd_io_print_string(string value)::link() -> void;
+bin function mbd_io_print_bool(bool value)::link() -> void;
+bin function mbd_io_string_length(string value)::link() -> i64;
+
+function print_i64(i64 value) -> void {
+    mbd_io_print_i64(value);
+}
+
+function print_f64(double value) -> void {
+    mbd_io_print_f64(value);
+}
+
+function print_string(string value) -> void {
+    mbd_io_print_string(value);
+}
+
+function print_bool(bool value) -> void {
+    mbd_io_print_bool(value);
+}
+
+function string_length(string value) -> i64 {
+    return mbd_io_string_length(value);
+}

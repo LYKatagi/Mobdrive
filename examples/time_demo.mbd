@@ -1,0 +1,12 @@
+enter(/time.mbd) {
+    const path "time.mbdb";
+};
+
+function main() -> int32 {
+    var started: i64 = time_now_ms();
+
+    // Sleep is only for demonstration; hot loops should use the clock without sleeping.
+    time_sleep_ms(25);
+    print(time_elapsed_ms(started));
+    return 0;
+}
