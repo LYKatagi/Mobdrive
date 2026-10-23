@@ -96,4 +96,5 @@ Makefile                 Build do compilador e dos exemplos
 
 ## Licença
 
-Consulte o arquivo de licença do projeto, se fornecido pela distribuição que você recebeu. Este repositório não declara uma licença neste README.
+Consulte o arquivo de licença do projeto, se fornecido pela distribuição que você recebeu. 
+Arquivo: [LICENSA](LICENSE)
