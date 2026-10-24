@@ -68,7 +68,7 @@ function log_message(string message) -> void {
 
 Parâmetros aceitam as formas `nome: tipo` e `tipo nome`. A função de entrada esperada pelo linker nativo é `main`; exemplos retornam `int` ou `int32`.
 
-`return;` representa retorno vazio. O typechecker valida o tipo do valor retornado quando existe um `return`, mas o protótipo não analisa de forma completa todos os caminhos de retorno.
+`return;` encerra uma função `void` sem valor. Em C, o codegen emite `return;`. Em funções com retorno não vazio, o typechecker rejeita `return;`. O typechecker valida o tipo do valor retornado quando existe um `return`, mas o protótipo não analisa de forma completa todos os caminhos de retorno.
 
 ## Expressões e operadores
 
@@ -85,7 +85,7 @@ Operadores reconhecidos pelo typechecker:
 | Adição | `+`, `-` |
 | Multiplicação | `*`, `/`, `%` |
 
-Unários reconhecidos: `&`, `*`, `!`, `~`, `+`, `-`. O typechecker permite conversões entre tipos numéricos. A compatibilidade de ponteiros é limitada; consulte as restrições em [Estado e limitações](06-status-e-limitacoes.md).
+Unários reconhecidos: `&`, `*`, `!`, `~`, `+`, `-`, `++`, `--`. Incremento e decremento também podem aparecer após uma expressão numérica, como `index++`. O typechecker permite conversões entre tipos numéricos. A compatibilidade de ponteiros é limitada; consulte as restrições em [Estado e limitações](06-status-e-limitacoes.md).
 
 ## Controle de fluxo
 
@@ -99,9 +99,15 @@ if (count > 0) {
 while (count < 10) {
     count = count + 1;
 }
+
+for (var index: int32 = 0; index < 10; index++) {
+    print(index);
+}
 ```
 
-`for`, `do/while`, `switch`, `break` e `continue` não fazem parte da gramática atual.
+`for` aceita uma declaração (`var`, `let`, `const` ou tipo primitivo explícito antes do nome), uma expressão de inicialização, ou uma cláusula vazia. A condição e a expressão de atualização também podem ser omitidas; por exemplo, `for (;;) { ... }`. A variável declarada no cabeçalho fica restrita ao loop. O corpo deve ser um bloco.
+
+`break;` encerra o loop mais interno e `continue;` pula para a próxima iteração. Ambos funcionam em `for` e `while`; o analisador semântico rejeita seu uso fora de loops. `do/while` e `switch` ainda não fazem parte da gramática atual.
 
 ## Saída simples
 

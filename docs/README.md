@@ -16,3 +16,12 @@ Esta documentação descreve o comportamento do compilador presente neste reposi
 - Os exemplos usam nomes e caminhos relativos à raiz do repositório.
 - `build/mobdrive` representa o executável do compilador no Linux. No Windows, use `build/mobdrive.exe`.
 - Blocos marcados como “conceito” não significam que a funcionalidade correspondente esteja completamente implementada.
+
+## Exemplo integrado
+
+[language_showcase.mbd](../examples/language_showcase.mbd) combina sintaxe da linguagem, stdlib, ponteiros, funções nativas e interface gráfica. A execução abre uma janela do sistema.
+
+
+## Guia do exemplo integrado
+
+[Explicação do language_showcase.mbd](07-explicacao-language-showcase.md) descreve o showcase seção por seção, com o fluxo de execução e as limitações relevantes.

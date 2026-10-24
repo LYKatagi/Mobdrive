@@ -9,7 +9,7 @@ static void indent(FILE*f,int n){while(n--)fputs("    ",f);}
 static void emit_c_name(FILE*f,const char*name){for(const char*s=name;*s;s++){if(s[0]==':'&&s[1]==':'){fputs("__",f);s++;}else fputc(*s,f);}}
 static void emit_type(FILE*f,const Project*p,const char*type){if(!type){fputs("int32_t",f);return;}const char*star=strchr(type,'*');size_t n=star?(size_t)(star-type):strlen(type);while(n&&isspace((unsigned char)type[n-1]))n--;char name[512];if(n>=sizeof name)n=sizeof name-1;memcpy(name,type,n);name[n]=0;if(find_class(p,name))emit_c_name(f,name);else fputs(name,f);if(star)fputs(star,f);}
 static int statement_declares(const Stmt*s,const char*name){
-    for(;s;s=s->next){if(s->kind==ST_VAR&&s->name&&!strcmp(s->name,name))return 1;if(statement_declares(s->body,name)||statement_declares(s->otherwise,name))return 1;}
+    for(;s;s=s->next){if(s->kind==ST_VAR&&s->name&&!strcmp(s->name,name))return 1;if(statement_declares(s->initializer,name)||statement_declares(s->body,name)||statement_declares(s->otherwise,name))return 1;}
     return 0;
 }
 static int local_name(const Function*fn,const char*name){
@@ -74,10 +74,24 @@ static void emit_statements(FILE*f,const Stmt*s,int depth,const Project*p,const 
     case ST_VAR:{const char*ty=s->type?s->type:infer_type(s->expr.text);if(s->is_const&&!strcmp(ty,"const char *")){fputs("const char * const ",f);emit_c_name(f,s->name);}else{if(s->is_const)fputs("const ",f);emit_type(f,p,ty);fputc(' ',f);emit_c_name(f,s->name);}if(s->expr.text){fputs(" = ",f);const char*e=s->expr.text;while(isspace((unsigned char)*e))e++;if(strchr(ty,'*')&&isdigit((unsigned char)*e)){fputc('(',f);emit_type(f,p,ty);fputs(")(uintptr_t)(",f);emit_expression(f,e,p,owner,fn);fputc(')',f);}else emit_expression(f,e,p,owner,fn);}fputs(";\n",f);break;}
     case ST_PRINT:fputs("mbd_print(",f);emit_expression(f,s->expr.text,p,owner,fn);fputs(");\n",f);break;
     case ST_RETURN:fputs("return",f);if(s->expr.text){fputc(' ',f);emit_expression(f,s->expr.text,p,owner,fn);}fputs(";\n",f);break;
+    case ST_BREAK:fputs("break;\n",f);break;
+    case ST_CONTINUE:fputs("continue;\n",f);break;
     case ST_EXPR:emit_expression(f,s->expr.text,p,owner,fn);fputs(";\n",f);break;
     case ST_BLOCK:fputs("{\n",f);emit_statements(f,s->body,depth+1,p,owner,fn);indent(f,depth);fputs("}\n",f);break;
     case ST_IF:fputs("if (",f);emit_expression(f,s->cond.text,p,owner,fn);fputs(") {\n",f);emit_statements(f,s->body,depth+1,p,owner,fn);indent(f,depth);fputs("}",f);if(s->otherwise){fputs(" else {\n",f);emit_statements(f,s->otherwise,depth+1,p,owner,fn);indent(f,depth);fputs("}",f);}fputc('\n',f);break;
     case ST_WHILE:fputs("while (",f);emit_expression(f,s->cond.text,p,owner,fn);fputs(") {\n",f);emit_statements(f,s->body,depth+1,p,owner,fn);indent(f,depth);fputs("}\n",f);break;
+    case ST_FOR:{
+        fputs("for (",f);
+        if(s->initializer&&s->initializer->kind==ST_VAR){
+            const Stmt*v=s->initializer;const char*ty=v->type?v->type:infer_type(v->expr.text);
+            if(v->is_const&&!strcmp(ty,"const char *")){fputs("const char * const ",f);emit_c_name(f,v->name);}
+            else{if(v->is_const)fputs("const ",f);emit_type(f,p,ty);fputc(' ',f);emit_c_name(f,v->name);}
+            if(v->expr.text){fputs(" = ",f);emit_expression(f,v->expr.text,p,owner,fn);}
+        }else if(s->initializer&&s->initializer->kind==ST_EXPR)emit_expression(f,s->initializer->expr.text,p,owner,fn);
+        fputs("; ",f);if(s->cond.text&&*s->cond.text)emit_expression(f,s->cond.text,p,owner,fn);
+        fputs("; ",f);if(s->step.text&&*s->step.text)emit_expression(f,s->step.text,p,owner,fn);
+        fputs(") {\n",f);emit_statements(f,s->body,depth+1,p,owner,fn);indent(f,depth);fputs("}\n",f);break;
+    }
     }}
 }
 static void emit_params(FILE*f,const Project*p,const Function*fn){

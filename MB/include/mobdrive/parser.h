@@ -4,10 +4,10 @@
 
 typedef struct Expr { char *text, *inferred_type; } Expr;
 typedef struct Param { char *type, *name; struct Param *next; } Param;
-typedef enum { ST_VAR, ST_PRINT, ST_RETURN, ST_IF, ST_WHILE, ST_EXPR, ST_BLOCK } StmtKind;
+typedef enum { ST_VAR, ST_PRINT, ST_RETURN, ST_IF, ST_WHILE, ST_FOR, ST_BREAK, ST_CONTINUE, ST_EXPR, ST_BLOCK } StmtKind;
 typedef struct Stmt {
-    StmtKind kind; char *name, *type; int is_const, infer_type, is_unsafe; Expr expr, cond;
-    struct Stmt *body, *otherwise, *next;
+    StmtKind kind; char *name, *type; int is_const, infer_type, is_unsafe; Expr expr, cond, step;
+    struct Stmt *initializer, *body, *otherwise, *next;
 } Stmt;
 typedef struct Function {
     char *name, *return_type, *link_mode, *owner; int is_external, is_method, is_interface_method, is_visual;

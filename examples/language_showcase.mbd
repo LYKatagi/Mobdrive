@@ -1,0 +1,263 @@
+/*
+    Mobdrive Language Showcase
+    Exemplo integrado dos recursos disponíveis no compilador atual.
+
+    A execução usa os runtimes C de IO, GC, tempo e UI e abre uma janela.
+    No Linux, a janela precisa de X11; no Windows, usa Win32/GDI.
+*/
+
+// Imports da stdlib: /nome.mbd é relativo à raiz da biblioteca Mobdrive.
+enter(/io.mbd) {
+    const path "io.mbdb";
+};
+
+enter(/math.mbd) {
+    const path "math.mbdb";
+};
+
+enter(/gc.mbd) {
+    const path "gc.mbdb";
+};
+
+enter(/time.mbd) {
+    const path "time.mbdb";
+};
+
+enter(/ui.mbd) {
+    const path "ui.mbdb";
+};
+
+// Constantes e variáveis globais com tipo explícito e inferido.
+const VERSION: string = "0.3.0";
+var execution_count: int32 = 0;
+var default_message = "Mobdrive suporta inferência local.";
+
+// Três estratégias de linkagem para funções externas.
+// Elas são declaradas, mas não chamadas neste exemplo.
+bin function native_link_example()::link() -> void;
+bin function native_nolink_example()::nolink() -> void;
+bin function native_decide_example()::decide() -> int32;
+
+// Os níveis são reconhecidos; atualmente não alteram as regras do typechecker.
+nochk {
+    add,
+    native_link_example
+}::strict;
+
+nochk {
+    native_nolink_example
+}::minchk;
+
+nochk {
+    native_decide_example
+}::none;
+
+// Namespace, constante e chamada qualificada.
+namespace demo {
+    const BASE_VALUE: int32 = 40;
+
+    function add_to_base(value: int32) -> int32 {
+        return BASE_VALUE + value;
+    }
+}
+
+function add(left: int32, right: int32) -> int32 {
+    return left + right;
+}
+
+// O formato tipo nome também é aceito para parâmetros.
+function return_legacy_parameter(int32 value) -> int32 {
+    return value;
+}
+
+function show_message(message: string) -> void {
+    print_string(message);
+}
+
+// while, if/else, comparações e atualização de variável.
+function count_up(limit: int32) -> void {
+    var index: int32 = 0;
+
+    while (index < limit) {
+        if (index == 1) {
+            index = index + 1;
+            continue;
+        }
+
+        if (index == 4) {
+            break;
+        }
+
+        if (index == 3) {
+            print_string("chegou ao número três");
+        } else {
+            print_i64(index);
+        }
+
+        index = index + 1;
+    }
+}
+
+// for demonstra inicialização local, condição e incremento pós-fixado.
+function sum_with_for(limit: int32) -> int32 {
+    var total: int32 = 0;
+
+    for (var index: int32 = 0; index < limit; index++) {
+        total += index;
+    }
+
+    return total;
+}
+
+function return_first_even(limit: int32) -> int32 {
+    for (var index: int32 = 0; index < limit; index++) {
+        if (index == 0 || index % 2 != 0) {
+            continue;
+        }
+
+        return index;
+    }
+
+    return -1;
+}
+
+function sum_until(limit: int32) -> int32 {
+    var total: int32 = 0;
+
+    for (var index: int32 = 0; index < 10; index++) {
+        if (index == limit) {
+            break;
+        }
+
+        total += index;
+    }
+
+    return total;
+}
+
+function finish_message() -> void {
+    print_string("loop finalizado");
+    return;
+}
+
+// Interface e alias socket.
+interface Runnable {
+    function run() -> void;
+}
+
+socket Disposable {
+    function close() -> void;
+}
+
+// Classe base e campo tipado.
+class Device {
+    public var name: string;
+
+    public function describe() -> void {
+        print_string(name);
+    }
+}
+
+// Herança simples e implementação de duas interfaces.
+class ConsoleDevice extends Device plug Runnable, Disposable {
+    public function run() -> void {
+        print_string("ConsoleDevice.run()");
+        print_string(name);
+    }
+
+    public function close() -> void {
+        print_string("ConsoleDevice.close()");
+    }
+}
+
+// Uma classe graphic com método visual abre a janela automaticamente
+// depois de enfileirar as operações de desenho.
+graphic class ShowcaseWindow plug Runnable {
+    public var title: string;
+
+    public visual run() -> void {
+        title = "Mobdrive Language Showcase";
+        draw_rect(30, 50, 420, 180, 0x245A9C);
+        draw_text_color(50, 80, "Mobdrive: recursos de linguagem", 0xFFFFFF);
+        draw_text(50, 115, "Feche esta janela para encerrar o exemplo.");
+    }
+}
+
+// Ponteiro explícito, endereço de variável, dereference e escrita indireta.
+function pointer_example() -> int32 {
+    var value: int32 = 41;
+
+    unsafe {
+        var value_pointer: int32* = &value;
+        *value_pointer = *value_pointer + 1;
+    }
+
+    return value;
+}
+
+// Demonstra as intrínsecas sem executá-las no fluxo principal.
+function low_level_example() -> void {
+    unsafe {
+        __c__("volatile int mobdrive_embedded_c_example = 1;");
+        __asm__("nop");
+    }
+}
+
+function main() -> int32 {
+    safe {
+        show_message("Mobdrive Language Showcase");
+        show_message(VERSION);
+        show_message(default_message);
+
+        var inferred_value = add(20, 22);
+        print_i64(inferred_value);
+        let compatibility_value: i32 = return_legacy_parameter(7);
+        print_i64(compatibility_value);
+        print_i64(demo::add_to_base(2));
+        print_i64(abs_i64(-12));
+
+        var enabled: bool = true;
+        var ratio: double = 3.5;
+        var initial: char = 'M';
+        print(enabled);
+        print_f64(ratio);
+        print(initial);
+
+        execution_count = execution_count + 1;
+        print_i64(execution_count);
+        print_i64(pointer_example());
+        count_up(5);
+        print_i64(sum_with_for(6)); // 0 + 1 + 2 + 3 + 4 + 5 = 15
+        print_i64(return_first_even(10)); // 2: continue ignora zero e ímpares.
+        print_i64(sum_until(4)); // 6: break encerra o for antes de somar 4.
+        finish_message();
+    }
+
+    // Alocação gerenciada e registro explícito de raiz.
+    var managed_value: int32* = gc_alloc(16);
+    gc_root(&managed_value);
+    *managed_value = 123;
+    print_i64(*managed_value);
+    gc_collect();
+    gc_unroot(&managed_value);
+
+    // Relógio monotônico e espera em milissegundos.
+    var start_time: i64 = time_now_ms();
+    time_sleep_ms(5);
+    print_i64(time_elapsed_ms(start_time));
+
+    // Demonstra instanciação sem construtor e chamadas de método.
+    var base_device: Device = new Device();
+    base_device.name = "dispositivo Mobdrive";
+    base_device.describe();
+
+    var console_device: ConsoleDevice = new ConsoleDevice();
+    console_device.run();
+    console_device.close();
+
+    // Abre uma janela nativa Win32/GDI ou X11 até o usuário fechá-la.
+    var window: ShowcaseWindow = new ShowcaseWindow();
+    window.run();
+
+    return 0;
+}

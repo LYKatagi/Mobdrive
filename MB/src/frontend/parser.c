@@ -61,10 +61,27 @@ static Stmt *statement(P *p){
         else if(s->infer_type)error(p,"type inference requires an initializer");
         expect(p,";");return s;
     }
+    if(is_type(p)){
+        s->kind=ST_VAR;s->type=type(p);s->name=identifier(p);
+        if(accept(p,"="))s->expr=expr(p,";",NULL);
+        expect(p,";");return s;
+    }
     if(accept(p,"print")){s->kind=ST_PRINT;expect(p,"(");s->expr=expr(p,")",NULL);expect(p,")");expect(p,";");return s;}
     if(accept(p,"return")){s->kind=ST_RETURN;if(!is(p,";"))s->expr=expr(p,";",NULL);expect(p,";");return s;}
+    if(accept(p,"break")){s->kind=ST_BREAK;expect(p,";");return s;}
+    if(accept(p,"continue")){s->kind=ST_CONTINUE;expect(p,";");return s;}
     if(accept(p,"if")){s->kind=ST_IF;expect(p,"(");s->cond=expr(p,")",NULL);expect(p,")");s->body=block(p);if(accept(p,"else"))s->otherwise=block(p);return s;}
     if(accept(p,"while")){s->kind=ST_WHILE;expect(p,"(");s->cond=expr(p,")",NULL);expect(p,")");s->body=block(p);return s;}
+    if(accept(p,"for")){
+        s->kind=ST_FOR;expect(p,"(");
+        if(!accept(p,";")){
+            if(is(p,"var")||is(p,"let")||is(p,"const")||is_type(p))s->initializer=statement(p);
+            else {s->initializer=(Stmt*)calloc(1,sizeof(*s->initializer));s->initializer->kind=ST_EXPR;s->initializer->expr=expr(p,";",NULL);expect(p,";");}
+        }
+        if(!accept(p,";")){s->cond=expr(p,";",NULL);expect(p,";");}
+        if(!accept(p,")")){s->step=expr(p,")",NULL);expect(p,")");}
+        s->body=block(p);return s;
+    }
     if(is(p,"}")){free(s);return NULL;}
     s->kind=ST_EXPR;s->expr=expr(p,";",NULL);expect(p,";");return s;
 }
@@ -166,7 +183,7 @@ int parser_parse(const TokenList *tokens,Program *pr){P p={tokens,0,tokens->erro
     while(cur(&p)->kind!=TOK_EOF){size_t before=p.at;top_item(&p,pr);if(before==p.at){error(&p,"unable to parse declaration");p.at++;}}
     free(p.name_space);return p.errors==0;
 }
-static void free_stmts(Stmt *s){while(s){Stmt *n=s->next;free(s->name);free(s->type);free(s->expr.text);free(s->expr.inferred_type);free(s->cond.text);free(s->cond.inferred_type);free_stmts(s->body);free_stmts(s->otherwise);free(s);s=n;}}
+static void free_stmts(Stmt *s){while(s){Stmt *n=s->next;free(s->name);free(s->type);free(s->expr.text);free(s->expr.inferred_type);free(s->cond.text);free(s->cond.inferred_type);free(s->step.text);free(s->step.inferred_type);free_stmts(s->initializer);free_stmts(s->body);free_stmts(s->otherwise);free(s);s=n;}}
 static void free_function(Function*f){while(f){Function*n=f->next;Param*a=f->params;while(a){Param*x=a->next;free(a->name);free(a->type);free(a);a=x;}free(f->name);free(f->return_type);free(f->link_mode);free(f->owner);free_stmts(f->body);free(f);f=n;}}
 void parser_free(Program *p){
     free_stmts(p->globals);

@@ -64,6 +64,8 @@ function main() -> int32 {
 }
 ```
 
+O programa [language_showcase.mbd](examples/language_showcase.mbd) reúne os recursos disponíveis no compilador e abre uma janela nativa. O Makefile também o compila junto dos outros exemplos.
+
 ## Documentação
 
 - [Índice da documentação](docs/README.md)
@@ -73,6 +75,7 @@ function main() -> int32 {
 - [Biblioteca padrão](docs/04-biblioteca-padrao.md)
 - [Arquitetura do compilador](docs/05-arquitetura-do-compilador.md)
 - [Estado e limitações](docs/06-status-e-limitacoes.md)
+- [Explicação do exemplo completo](docs/07-explicacao-language-showcase.md)
 
 ## Estrutura do repositório
 

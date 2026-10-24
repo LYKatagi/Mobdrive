@@ -25,7 +25,8 @@ SOURCES = $(SOURCE_DIR)/src/cli/main.c $(SOURCE_DIR)/src/frontend/lexer.c $(SOUR
 HEADERS = $(wildcard $(INCLUDE_DIR)/mobdrive/*.h)
 DEMOS = $(BUILD_DIR)/hello$(APP_EXT) $(BUILD_DIR)/imported$(APP_EXT) $(BUILD_DIR)/ffi$(APP_EXT) \
         $(BUILD_DIR)/stdlib_demo$(APP_EXT) $(BUILD_DIR)/concept_demo$(APP_EXT) $(BUILD_DIR)/gc_demo$(APP_EXT) \
-        $(BUILD_DIR)/framework_demo$(APP_EXT) $(BUILD_DIR)/time_demo$(APP_EXT) $(BUILD_DIR)/ui_demo$(APP_EXT)
+        $(BUILD_DIR)/framework_demo$(APP_EXT) $(BUILD_DIR)/time_demo$(APP_EXT) $(BUILD_DIR)/ui_demo$(APP_EXT) \
+        $(BUILD_DIR)/language_showcase$(APP_EXT)
 
 all: $(COMPILER) $(ELF_COMPILER) $(DEMOS)
 
@@ -64,6 +65,9 @@ $(BUILD_DIR)/time_demo$(APP_EXT): $(COMPILER) $(EXAMPLE_DIR)/time_demo.mbd $(SOU
 
 $(BUILD_DIR)/ui_demo$(APP_EXT): $(COMPILER) $(EXAMPLE_DIR)/ui_demo.mbd $(SOURCE_DIR)/stdlib/ui.mbd $(SOURCE_DIR)/stdlib/ui_runtime.c | $(BUILD_DIR)
 	./$(COMPILER) build $(EXAMPLE_DIR)/ui_demo.mbd -o $@ --link-options $(SOURCE_DIR)/stdlib/ui_runtime.c $(UI_LINK_OPTIONS)
+
+$(BUILD_DIR)/language_showcase$(APP_EXT): $(COMPILER) $(EXAMPLE_DIR)/language_showcase.mbd $(SOURCE_DIR)/stdlib/io.mbd $(SOURCE_DIR)/stdlib/runtime.c $(SOURCE_DIR)/stdlib/math.mbd $(SOURCE_DIR)/stdlib/gc.mbd $(SOURCE_DIR)/stdlib/gc_runtime.c $(SOURCE_DIR)/stdlib/time.mbd $(SOURCE_DIR)/stdlib/time_runtime.c $(SOURCE_DIR)/stdlib/ui.mbd $(SOURCE_DIR)/stdlib/ui_runtime.c | $(BUILD_DIR)
+	./$(COMPILER) build $(EXAMPLE_DIR)/language_showcase.mbd -o $@ --link-options $(SOURCE_DIR)/stdlib/runtime.c --link-options $(SOURCE_DIR)/stdlib/gc_runtime.c --link-options $(SOURCE_DIR)/stdlib/time_runtime.c --link-options $(SOURCE_DIR)/stdlib/ui_runtime.c $(UI_LINK_OPTIONS)
 
 kernel-elf: $(ELF_COMPILER) $(EXAMPLE_DIR)/kernel_minimal.mbd
 	./$(ELF_COMPILER) build $(EXAMPLE_DIR)/kernel_minimal.mbd -o $(BUILD_DIR)/kernel_minimal.elf --cc $(ELF_CC)
